@@ -267,15 +267,15 @@
 	    if (acceptInput) {
 		if (keyCode in keyCodes) {
                     cancelKeyPress = keyCode;
-		    (keyCodes[keyCode])();
+		    (keyCodes[keyCode])(e);
 		    return false;
 		} else if (e.ctrlKey && keyCode in ctrlCodes) {
                     cancelKeyPress = keyCode;
-		    (ctrlCodes[keyCode])();
+		    (ctrlCodes[keyCode])(e);
 		    return false;
 		} else if (e.altKey  && keyCode in altCodes) {
                     cancelKeyPress = keyCode;
-		    (altCodes[keyCode])();
+		    (altCodes[keyCode])(e);
 		    return false;
 		}
 	    }
@@ -395,19 +395,19 @@
 
         ////////////////////////////////////////////////////////////////////////
         // Validate command and trigger it if valid, or show a validation error
-        function commandTrigger() {
+        function commandTrigger(e) {
             var line = promptText;
             if (typeof config.commandValidate == 'function') {
-                var ret = config.commandValidate(line);
+                var ret = config.commandValidate(line, e);
                 if (ret == true || ret == false) {
                     if (ret) {
-                        handleCommand();
+                        handleCommand(e);
                     }
                 } else {
                     commandResult(ret,"jquery-console-message-error");
                 }
             } else {
-                handleCommand();
+                handleCommand(e);
             }
         };
 
@@ -424,7 +424,7 @@
 
         ////////////////////////////////////////////////////////////////////////
         // Handle a command
-        function handleCommand() {
+        function handleCommand(e) {
             if (typeof config.commandHandle == 'function') {
 		disableInput();
                 addToHistory(promptText);
@@ -437,7 +437,7 @@
                 if (continuedText) text = continuedText;
                 var ret = config.commandHandle(text,function(msgs){
                     commandResult(msgs);
-                });
+                }, e);
                 if (extern.continuedPrompt && !continuedText)
                   continuedText = promptText;
                 if (typeof ret == 'boolean') {
